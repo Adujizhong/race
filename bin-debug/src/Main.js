@@ -35,8 +35,6 @@ var Main = (function (_super) {
     function Main() {
         _super.call(this);
         this.mRoadBound = 0.0934;
-        this.mCarDirect = 0;
-        this.mTrack = 3;
         this.addEventListener(egret.Event.ADDED_TO_STAGE, this.onAddToStage, this);
     }
     Main.prototype.onAddToStage = function (event) {
@@ -83,72 +81,26 @@ var Main = (function (_super) {
         }
     };
 
-    /**
-    * 创建游戏场景
-    */
     Main.prototype.createGameScene = function () {
-        var sky = Util.createBitmapByName("road");
-        this.addChild(sky);
-        var stageW = this.stage.stageWidth;
-        var stageH = this.stage.stageHeight;
-        sky.width = stageW;
-        sky.height = stageH;
+        this.mMainUI = new MainUI(this.onStart, this);
+        this.mReadyUI = new ReadyUI(this.startGame, this);
 
-        this.mRoad = new Road();
-        this.mRoad.x = this.mRoad.y = 0;
-        this.addChild(this.mRoad);
-        this.mRoad.speed = 8;
-        this.mRoad.run();
-        this.mRoad.touchEnabled = false;
-
-        this.mCar = Util.createBitmapByName("car");
-        this.mCar.anchorX = this.mCar.anchorY = 0.5;
-        this.addChild(this.mCar);
-        this.mCar.x = stageW / 2;
-        this.mCar.y = stageH * 2 / 3;
-        this.mCar.scaleX = 0.2;
-        this.mCar.scaleY = 0.2;
-
-        this.touchEnabled = true;
-        this.addEventListener(egret.TouchEvent.TOUCH_BEGIN, this.onTouchBegin, this);
+        this.addChild(this.mMainUI);
     };
 
-    Main.prototype.onTouchBegin = function (e) {
-        this.removeEventListener(egret.TouchEvent.TOUCH_BEGIN, this.onTouchBegin, this);
-        this.addEventListener(egret.TouchEvent.TOUCH_END, this.onTouchEnd, this);
-        this.move(e.stageX);
-    };
-
-    Main.prototype.onTouchEnd = function (e) {
-        this.removeEventListener(egret.TouchEvent.TOUCH_END, this.onTouchEnd, this);
-        this.stopMove();
-    };
-
-    Main.prototype.move = function (stageX) {
-        if (stageX < Util.stage_width / 2) {
-            this.changeTrack(this.mTrack - 1);
-        } else {
-            this.changeTrack(this.mTrack + 1);
+    Main.prototype.onStart = function () {
+        if (this.mMainUI != null) {
+            this.mMainUI.parent.removeChild(this.mMainUI);
         }
+        this.addChild(this.mReadyUI);
+        this.mReadyUI.ready();
     };
 
-    Main.prototype.changeTrack = function (track) {
-        if (track < 1 || track > 5) {
-            return;
+    Main.prototype.startGame = function () {
+        if (this.mReadyUI && this.mReadyUI.parent) {
+            this.mReadyUI.clear();
+            this.removeChild(this.mReadyUI);
         }
-        this.mTrack = track;
-        egret.Tween.removeTweens(this.mCar);
-        egret.Tween.get(this.mCar, { loop: false }).to({ x: this.getTrackX(track) }, 300);
-    };
-
-    Main.prototype.stopMove = function () {
-        this.addEventListener(egret.TouchEvent.TOUCH_BEGIN, this.onTouchBegin, this);
-    };
-
-    Main.prototype.getTrackX = function (track) {
-        var bound = Util.stage_width * this.mRoadBound;
-        var value = bound + (Util.stage_width - bound * 2) / 10 * (track * 2 - 1);
-        return value;
     };
     return Main;
 })(egret.DisplayObjectContainer);

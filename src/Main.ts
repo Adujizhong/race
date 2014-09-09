@@ -32,6 +32,8 @@ class Main extends egret.DisplayObjectContainer{
      */
     private loadingView:LoadingUI;
     private mRoadBound:number = 0.0934;
+    private mMainUI:MainUI;
+    private mReadyUI:ReadyUI;
 
     public constructor() {
         super();
@@ -78,83 +80,30 @@ class Main extends egret.DisplayObjectContainer{
         }
     }
 
-    private mRoad:Road;
-    private mCar:egret.Bitmap;
-    private mCarDirect:number = 0;
-    private mTrack:number = 3; //当前赛道，默认是中间的3
-    /**
-     * 创建游戏场景
-     */
-    private createGameScene():void{
-        var sky:egret.Bitmap = Util.createBitmapByName("road");
-        this.addChild(sky);
-        var stageW:number = this.stage.stageWidth;
-        var stageH:number = this.stage.stageHeight;
-        sky.width = stageW;
-        sky.height = stageH;
+    private createGameScene():void
+    {
+        this.mMainUI = new MainUI(this.onStart, this);
+        this.mReadyUI = new ReadyUI(this.startGame, this);
 
-        this.mRoad = new Road();
-        this.mRoad.x = this.mRoad.y = 0;
-        this.addChild(this.mRoad);
-        this.mRoad.speed = 8;
-        this.mRoad.run();
-        this.mRoad.touchEnabled = false;
-
-        this.mCar = Util.createBitmapByName("car");
-        this.mCar.anchorX = this.mCar.anchorY = 0.5;
-        this.addChild(this.mCar);
-        this.mCar.x = stageW / 2;
-        this.mCar.y = stageH * 2 / 3;
-        this.mCar.scaleX = 0.2;
-        this.mCar.scaleY = 0.2;
-
-        this.touchEnabled = true;
-        this.addEventListener(egret.TouchEvent.TOUCH_BEGIN, this.onTouchBegin, this);
+        this.addChild(this.mMainUI);
     }
 
-    private onTouchBegin(e:egret.TouchEvent):void
+    public onStart():void
     {
-        this.removeEventListener(egret.TouchEvent.TOUCH_BEGIN, this.onTouchBegin, this);
-        this.addEventListener(egret.TouchEvent.TOUCH_END, this.onTouchEnd, this);
-        this.move(e.stageX);
-    }
-
-    private onTouchEnd(e:egret.TouchEvent):void
-    {
-        this.removeEventListener(egret.TouchEvent.TOUCH_END, this.onTouchEnd, this);
-        this.stopMove();
-    }
-
-    private move(stageX:number):void
-    {
-        if(stageX < Util.stage_width / 2)
+        if(this.mMainUI != null)
         {
-            this.changeTrack(this.mTrack - 1);
-        }else{
-            this.changeTrack(this.mTrack + 1);
+            this.mMainUI.parent.removeChild(this.mMainUI);
         }
+        this.addChild(this.mReadyUI);
+        this.mReadyUI.ready();
     }
 
-    private changeTrack(track:number):void
+    public startGame():void
     {
-        if(track < 1 || track > 5)
+        if(this.mReadyUI && this.mReadyUI.parent)
         {
-            return;
+            this.mReadyUI.clear();
+            this.removeChild(this.mReadyUI);
         }
-        this.mTrack = track;
-        egret.Tween.removeTweens(this.mCar);
-        egret.Tween.get(this.mCar, { loop: false }).to({ x: this.getTrackX(track) }, 300);
-    }
-
-    private stopMove():void
-    {
-        this.addEventListener(egret.TouchEvent.TOUCH_BEGIN, this.onTouchBegin, this);
-    }
-
-    private getTrackX(track:number):number
-    {
-        var bound:number = Util.stage_width * this.mRoadBound;
-        var value:number = bound + (Util.stage_width - bound * 2) / 10 * (track * 2 - 1);
-        return value;
     }
 }
