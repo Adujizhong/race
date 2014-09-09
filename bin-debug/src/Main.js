@@ -83,8 +83,6 @@ var Main = (function (_super) {
 
     Main.prototype.createGameScene = function () {
         this.mMainUI = new MainUI(this.onStart, this);
-        this.mReadyUI = new ReadyUI(this.startGame, this);
-
         this.addChild(this.mMainUI);
     };
 
@@ -92,6 +90,7 @@ var Main = (function (_super) {
         if (this.mMainUI != null) {
             this.mMainUI.parent.removeChild(this.mMainUI);
         }
+        this.mReadyUI = new ReadyUI(this.startGame, this);
         this.addChild(this.mReadyUI);
         this.mReadyUI.ready();
     };

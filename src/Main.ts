@@ -83,8 +83,6 @@ class Main extends egret.DisplayObjectContainer{
     private createGameScene():void
     {
         this.mMainUI = new MainUI(this.onStart, this);
-        this.mReadyUI = new ReadyUI(this.startGame, this);
-
         this.addChild(this.mMainUI);
     }
 
@@ -94,6 +92,7 @@ class Main extends egret.DisplayObjectContainer{
         {
             this.mMainUI.parent.removeChild(this.mMainUI);
         }
+        this.mReadyUI = new ReadyUI(this.startGame, this);
         this.addChild(this.mReadyUI);
         this.mReadyUI.ready();
     }
