@@ -1,0 +1,14 @@
+{
+"resources":
+	[
+		{"name":"car","type":"image","url":"assets/car.png"},
+		{"name":"line","type":"image","url":"assets/line.png"},
+        {"name":"road","type":"image","url":"assets/road.png"},
+        {"name":"description","type":"json","url":"config/description.json"}
+	],
+
+"groups":
+	[
+        {"name":"preload","keys":"car, line, road"}
+	]
+}
